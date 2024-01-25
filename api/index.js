@@ -1,8 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-// import { error } from 'console';
 import userRouter from "./routes/user.route.js";
+import authRouter from "./routes/auth.route.js";
 
 dotenv.config();
 
@@ -17,9 +17,12 @@ mongoose
 
 const app = express();
 
+app.use(express.json());
+
 app.listen(3000, () => {
     console.log("Server running at 3000  ddS@@@ !!");
 });
 
 //api route
 app.use("/api/user", userRouter);
+app.use("/api/auth",authRouter);
