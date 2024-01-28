@@ -17,7 +17,7 @@ export default function Header() {
     navigate(`/search?${searchQuery}`);
   };
 
-
+  //for rendering the page when we are changing the url it will come in search also
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get('searchTerm');
