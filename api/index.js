@@ -37,7 +37,7 @@ app.use("/api/listing",listingRouter);
 
 //after api route we have to deploying 
 app.use(express.static(path.join(_dirname,'/client/dist')));
-app('*',(req,res) => {
+app.get('*',(req,res) => {
     res.sendFile(path.join(_dirname,'client','dist','index.html')) ;
 })
 
