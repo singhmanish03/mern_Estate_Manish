@@ -20,6 +20,7 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import Modal from "react-modal";
 export default function Profile() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -32,7 +33,8 @@ export default function Profile() {
   const [userListings, setUserListings] = useState([]);
   const [showListings, setShowListings] = useState(false);
   const dispatch = useDispatch();
-  console.log(formData);
+
+  // console.log(formData);
   //fire base storage par likhe hai yeh sab
   // allow read;
   // allow write: if
@@ -100,34 +102,40 @@ export default function Profile() {
   };
 
   const handleDeleteUser = async () => {
-    try {
-      dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method: "DELETE",
-      });
-      const data = await res.json();
-      if (data.success === false) {
-        dispatch(deleteUserFailure(data.message));
-        return;
+    const isConfirmed = window.confirm("Are you sure you want to delete?");
+    if (isConfirmed) {
+      try {
+        dispatch(deleteUserStart());
+        const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (data.success === false) {
+          dispatch(deleteUserFailure(data.message));
+          return;
+        }
+        dispatch(deleteUserSuccess(data));
+      } catch (error) {
+        dispatch(deleteUserFailure(error.message));
       }
-      dispatch(deleteUserSuccess(data));
-    } catch (error) {
-      dispatch(deleteUserFailure(error.message));
     }
   };
 
   const handleSignOut = async () => {
-    try {
-      dispatch(signOutUserStart());
-      const res = await fetch("/api/auth/signout");
-      const data = await res.json();
-      if (data.success === false) {
-        dispatch(deleteUserFailure(data.message));
-        return;
+    const isConfirmed = window.confirm("Are you sure you want to sign out ?");
+    if (isConfirmed) {
+      try {
+        dispatch(signOutUserStart());
+        const res = await fetch("/api/auth/signout");
+        const data = await res.json();
+        if (data.success === false) {
+          dispatch(deleteUserFailure(data.message));
+          return;
+        }
+        dispatch(signOutUserSuccess(data));
+      } catch (error) {
+        dispatch(signOutUserFailure(data.message));
       }
-      dispatch(signOutUserSuccess(data));
-    } catch (error) {
-      dispatch(signOutUserFailure(data.message));
     }
   };
 
@@ -148,23 +156,43 @@ export default function Profile() {
     }
   };
 
-  const handleListingDelete = async (listingId) => {
-    try {
-      const res = await fetch(`/api/listing/delete/${listingId}`, {
-        method: "DELETE",
-      });
-      const data = await res.json();
-      if (data.success === false) {
-        console.log(data.message);
-        return;
-      }
 
-      setUserListings((prev) =>
-        prev.filter((listing) => listing._id !== listingId)
-      );
-    } catch (error) {
-      console.log(error.message);
+  const handleListingDelete = async (listingId) => {
+    const isConfirmed = window.confirm("Are you sure you want to sign out ?");
+    if(isConfirmed){
+      try {
+        const res = await fetch(`/api/listing/delete/${listingId}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (data.success === false) {
+          console.log(data.message);
+          return;
+        }
+        setUserListings((prev) =>
+          prev.filter((listing) => listing._id !== listingId)
+        );
+      } catch (error) {
+        console.log(error.message);
+      }
     }
+  };
+
+  const handleConfirmDelete = async (listingId) => {
+    // Performing  delete operation here
+   
+    // Close the modal after deletion
+    setIsDeleteModalOpen(false);
+
+    console.log('Item deleted!');
+
+   
+  };
+
+  const handleCancelDelete = () => {
+    // Close the modal without deleting
+    setIsDeleteModalOpen(false);
+    setListingIdToDelete(null);
   };
 
   return (
@@ -256,8 +284,8 @@ export default function Profile() {
       <button onClick={handleShowListings} className="text-green-700 w-full">
         {showListings ? "Hide Listings" : "Show Listings"}
       </button>
-        {/* .......................................... */}
-          {/* user listing checking */}
+      {/* .......................................... */}
+      {/* user listing checking */}
       {showListings && (
         <div>
           <p className="text-red-700 mt-5">

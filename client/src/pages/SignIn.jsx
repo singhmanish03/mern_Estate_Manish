@@ -1,45 +1,48 @@
-import { useState } from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { signInStart,signInSuccess,signInFailure } from '../redux/user/userSlice';
-import OAuth from '../components/OAuth';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
-  const [formData,setFormData] =useState({});
-  const {error,loading} = useSelector((state) => state.user); //reducer name is user
-  const navigate =useNavigate();
-  const dispatch =useDispatch()
+  const [formData, setFormData] = useState({});
+  const { error, loading } = useSelector((state) => state.user); //reducer name is user
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-        [e.target.id] : e.target.value,
-    })
-  }
-  
+      [e.target.id]: e.target.value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       dispatch(signInStart()); //from redux we are setting the value
-        //we have set server and proxy to vite.config.js
-      const res = await fetch ('/api/auth/signin',
-      {
-        method: 'POST',
-        headers:{
-          'Content-Type' : 'application/json',
+      //we have set server and proxy to vite.config.js
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
-      const data =await res.json() ;
+      const data = await res.json();
       console.log(data);
-      if(data.success==false){
+      if (data.success == false) {
         dispatch(signInFailure(data.message));
         return;
       }
       dispatch(signInSuccess(data));
-      navigate('/');
+      navigate("/");
     } catch (error) {
-        dispatch(signInFailure(error.message));
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -53,7 +56,6 @@ export default function SignIn() {
           className="border p-3 rounded-lg"
           id="email"
           onChange={handleChange}
-
         />
         <input
           type="password"
@@ -62,18 +64,21 @@ export default function SignIn() {
           id="password"
           onChange={handleChange}
         />
-        <button disabled={loading} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
-          {loading ? 'Loading' : 'Sign In'}
+        <button
+          disabled={loading}
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+        >
+          {loading ? "Loading" : "Sign In"}
         </button>
-        <OAuth/>
+        <OAuth />
       </form>
-      <div className='flex gap-2 mt-5'>
+      <div className="flex gap-2 mt-5">
         <p>Dont have an account? </p>
         <Link to={"/sign-up"}>
-          <span className='text-blue-700 '>Sign up</span>
+          <span className="text-blue-700 ">Sign up</span>
         </Link>
       </div>
-      {error && <p className='text-red-500 mt-5'> {error}</p>}
+      {error && <p className="text-red-500 mt-5"> {error}</p>}
     </div>
   );
 }
