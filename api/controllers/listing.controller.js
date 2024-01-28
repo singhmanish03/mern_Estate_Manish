@@ -68,10 +68,11 @@ export const getListings = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit) || 9;
     const startIndex = parseInt(req.query.startIndex) || 0;
+
     let offer = req.query.offer;
 
     if (offer === undefined || offer === 'false') {
-      offer = { $in: [false, true] };
+      offer = { $in: [false, true] };  //search inside database In
     }
 
     let furnished = req.query.furnished;
@@ -99,13 +100,13 @@ export const getListings = async (req, res, next) => {
     const order = req.query.order || 'desc';
 
     const listings = await Listing.find({
-      name: { $regex: searchTerm, $options: 'i' },
+      name: { $regex: searchTerm, $options: 'i' },  //regex means search for title and option i means we anything can be capital or small 
       offer,
       furnished,
       parking,
       type,
     })
-      .sort({ [sort]: order })
+      .sort({ [sort]: order }) 
       .limit(limit)
       .skip(startIndex);
 
